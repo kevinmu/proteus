@@ -71,7 +71,7 @@ func (s *Scanner) Scan() ([]*Package, error) {
 			mut.Lock()
 			defer mut.Unlock()
 			if err != nil {
-				errors.add(fmt.Errorf("error scanning package %q: %s", p, err))
+				errors.add(fmt.Errorf("error scanning package %q: %s\n", p, err))
 				return
 			}
 

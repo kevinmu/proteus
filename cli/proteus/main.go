@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	packages cli.StringSlice
-	path     string
-	verbose  bool
+	packages            cli.StringSlice
+	path                string
+	packageNameOverride string
+	verbose             bool
 )
 
 func main() {
@@ -45,14 +46,20 @@ func main() {
 		Destination: &path,
 	}
 
-	app.Flags = append(baseFlags, folderFlag)
+	packageNameFlag := cli.StringFlag{
+		Name: "packageNameOverride, o",
+		Usage: "The proto package name will be this value.",
+		Destination: &packageNameOverride,
+	}
+
+	app.Flags = append(append(baseFlags, folderFlag), packageNameFlag)
 	app.Commands = []cli.Command{
 		{
 			Name:        "proto",
 			Description: "Generates .proto files from your Go source code.",
 			Usage:       "Generates .proto files from Go packages",
 			Action:      initCmd(genProtos),
-			Flags:       append(baseFlags, folderFlag),
+			Flags:       app.Flags,
 		},
 		{
 			Name:        "rpc",
@@ -75,7 +82,7 @@ type action func(c *cli.Context) error
 func initCmd(next action) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		if len(packages) == 0 {
-			return errors.New("no package provided, there is nothing to generate")
+			return errors.New("no package provided, there is nothing to generate!!!")
 		}
 
 		if !verbose {
@@ -98,6 +105,7 @@ func genProtos(c *cli.Context) error {
 	return proteus.GenerateProtos(proteus.Options{
 		BasePath: path,
 		Packages: packages,
+		PackageNameOverride: packageNameOverride,
 	})
 }
 

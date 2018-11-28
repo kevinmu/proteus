@@ -58,12 +58,13 @@ func (r *Resolver) resolvePackage(p *scanner.Package, info *packagesInfo) {
 		if r.resolveFunc(f, info) {
 			funcs = append(funcs, f)
 		} else {
+			fmt.Printf("func %s had an unresolvable type and it will not be generated", f.Name)
 			report.Warn("func %s had an unresolvable type and it will not be generated", f.Name)
 		}
 	}
 	p.Funcs = funcs
 
-	r.removeUnmarkedStructs(p, info)
+	//r.removeUnmarkedStructs(p, info)
 	p.Resolved = true
 }
 
@@ -99,6 +100,8 @@ func (r *Resolver) removeUnmarkedStructs(p *scanner.Package, info *packagesInfo)
 		name := fmt.Sprintf("%s.%s", p.Path, s.Name)
 		if info.isStructMarked(name) {
 			structs = append(structs, s)
+		} else {
+			fmt.Printf("struct is unmarked: %v\n", s.Name)
 		}
 	}
 	p.Structs = structs

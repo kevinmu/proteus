@@ -211,7 +211,7 @@ func (s *GenSuite) TestGenerate() {
 		Enums:    []*Enum{mockEnum},
 		Options:  Options{"foo": NewLiteralValue("true")},
 		RPCs:     mockRpcs,
-	})
+	}, "")
 	s.Nil(err)
 
 	bytes, err := ioutil.ReadFile(filepath.Join(s.path, "generated.proto"))

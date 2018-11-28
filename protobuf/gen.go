@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"gopkg.in/src-d/proteus.v1/report"
+	"strings"
 )
 
 // Generator is in charge of generating the .proto files and write them
@@ -23,7 +24,7 @@ func NewGenerator(basePath string) *Generator {
 
 // Generate generates the proto3 .proto file of the given package and
 // writes it to disk.
-func (g *Generator) Generate(pkg *Package) error {
+func (g *Generator) Generate(pkg *Package, pkgNameOverride string) error {
 	var buf bytes.Buffer
 	buf.WriteString(`syntax = "proto3";` + "\n")
 
@@ -35,6 +36,7 @@ func (g *Generator) Generate(pkg *Package) error {
 
 	for _, msg := range pkg.Messages {
 		writeMessage(&buf, msg)
+		fmt.Printf("%v\n", msg.Name)
 		buf.WriteRune('\n')
 	}
 
@@ -47,7 +49,11 @@ func (g *Generator) Generate(pkg *Package) error {
 		writeService(&buf, pkg)
 	}
 
-	return g.writeFile(pkg.Path, buf.Bytes())
+	bufStr := buf.String()
+	if pkgNameOverride != "" {
+		bufStr = strings.Replace(bufStr, pkg.Name, pkgNameOverride, -1)
+	}
+	return g.writeFile(pkg.Path, []byte(bufStr))
 }
 
 func (g *Generator) writeFile(path string, data []byte) error {
